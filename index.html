@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,6 +58,7 @@ footer{text-align:center;color:#66728b;font-size:12px;margin-top:34px}
 <section class="view" id="blackjack"><div class="game-layout"><div class="card game-main"><h2>🂡 Blackjack</h2><p>Beat the dealer without going over 21. Aces count as 1 or 11.</p><div class="toolbar"><span class="status" id="bjStatus">Press Deal to start.</span></div><h3 class="hand-title">Dealer <span class="muted" id="dealerTotal"></span></h3><div class="playing-hand" id="dealerHand"></div><h3 class="hand-title">You <span class="muted" id="playerTotal"></span></h3><div class="playing-hand" id="playerHand"></div><div class="toolbar"><button class="primary" id="dealBtn" onclick="deal()">Deal</button><button id="hitBtn" onclick="hit()" disabled>Hit</button><button id="standBtn" onclick="stand()" disabled>Stand</button></div></div><aside class="side"><div class="card"><h3>Table rules</h3><p>Dealer stands on 17. A natural blackjack pays as a win. This is just for fun — no money or betting.</p></div><div class="card"><h3>Session record</h3><div class="two"><div><div class="muted">Wins</div><div class="stat" id="bjWins">0</div></div><div><div class="muted">Losses</div><div class="stat" id="bjLosses">0</div></div></div></div></aside></div></section>
 
 <section class="view" id="tetris"><div class="game-layout"><div class="card game-main"><h2>🧱 Tetris</h2><p>← → move · ↑ rotate · ↓ soft drop · Space hard drop · P pause</p><div class="canvas-wrap"><canvas id="tetrisCanvas" class="gamecanvas" width="300" height="600"></canvas></div><div class="controls"><button class="primary" onclick="startTetris()">Start / Restart</button><button onclick="pauseTetris()">Pause</button><span class="status" id="tetrisScore">Score: 0</span></div><div class="controls"><button onclick="moveT(-1)">←</button><button onclick="rotateT()">↻ Rotate</button><button onclick="moveT(1)">→</button><button onclick="dropT()">↓</button><button onclick="hardDropT()">Hard drop</button></div></div><aside class="side"><div class="card"><h3>Best score</h3><div class="stat" id="tetrisBest">0</div><p>Saved on this device.</p></div><div class="card"><h3>How to play</h3><p>Complete horizontal lines to clear them. The more lines you clear at once, the more points you earn.</p></div></aside></div></section>
+
 <section class="view" id="youtube">
   <div class="youtube-layout">
     <div class="youtube-card">
@@ -131,28 +133,36 @@ function youtubeVideoId(input){
     return /^[A-Za-z0-9_-]{11}$/.test(id)?id:'';
   }catch{return '';}
 }
+
 function youtubeLoad(event){
- rel: '0',
-    playsinline: '1',
-    origin: location.origin,
-    enablejsapi: '1'
+  event.preventDefault();
+
+  const raw=$('youtubeInput').value.trim();
+  const id=youtubeVideoId(raw);
+
+  if(!id){
+    $('youtubeStatus').textContent='Invalid YouTube link or video ID.';
+    return;
+  }
+
+  const params=new URLSearchParams({
+    rel:'0',
+    playsinline:'1',
+    origin:location.origin,
+    enablejsapi:'1'
   });
 
-  const frame = document.createElement('iframe');
-  frame.title = 'YouTube video player';
-  frame.src =
-    'https://www.youtube-nocookie.com/embed/' +
-    encodeURIComponent(id) + '?' + params.toString();
-
-  frame.allow =
-    'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-
-  frame.referrerPolicy = 'origin';
-  frame.allowFullscreen = true;
+  const frame=document.createElement('iframe');
+  frame.title='YouTube video player';
+  frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?'+params.toString();
+  frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  frame.referrerPolicy='origin';
+  frame.allowFullscreen=true;
 
   $('youtubeFrameWrap').replaceChildren(frame);
-  $('youtubeStatus').textContent = 'Loading YouTube player...';
+  $('youtubeStatus').textContent='Video loaded. Press play to start.';
 }
+
 // MINESWEEPER
 let mw=9,mh=9,mineCount=10,mineVals=[],mineOpen=new Set(),mineFlags=new Set(),mineEnded=false,mineFirst=true,flagMode=false;
 function newMines(){[mw,mh,mineCount]=$('mineLevel').value.split(',').map(Number);mineVals=Array(mw*mh).fill(0);mineOpen.clear();mineFlags.clear();mineEnded=false;mineFirst=true;flagMode=false;$('flagMode').textContent='⚑ Flag mode: off';$('mineStatus').textContent='Good luck!';$('mineLeft').textContent=mineCount;placeMines();renderMines()}
@@ -254,4 +264,5 @@ spHandleCallback();
 // Shared keyboard controls
 document.addEventListener('keydown',e=>{let typing=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName);if(typing)return;let onSnake=$('snake').classList.contains('active'),onTetris=$('tetris').classList.contains('active');if(onSnake){let dirs={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};if(dirs[e.key]){e.preventDefault();snakeDir(...dirs[e.key])}}if(onTetris){if(['ArrowLeft','ArrowRight','ArrowDown','ArrowUp',' '].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft')moveT(-1);if(e.key==='ArrowRight')moveT(1);if(e.key==='ArrowDown')dropT();if(e.key==='ArrowUp')rotateT();if(e.code==='Space')hardDropT();if(e.key.toLowerCase()==='p')pauseTetris()}});
 </script>
-</body></html>
+</body>
+</html>
