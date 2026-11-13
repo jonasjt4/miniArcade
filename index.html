@@ -132,20 +132,27 @@ function youtubeVideoId(input){
   }catch{return '';}
 }
 function youtubeLoad(event){
-  event?.preventDefault();
-  const raw=$('youtubeInput').value;
-  const id=youtubeVideoId(raw);
-  if(!id){$('youtubeStatus').textContent='That does not look like a valid YouTube video link or 11-character video ID.';return;}
-  const frame=document.createElement('iframe');
-  frame.title='YouTube video player';
-  frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?rel=0&playsinline=1';
-  frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-  frame.referrerPolicy='strict-origin-when-cross-origin';
-  frame.allowFullscreen=true;
-  const wrap=$('youtubeFrameWrap');wrap.replaceChildren(frame);
-  $('youtubeStatus').textContent='Video loaded. Press play to start.';
-}
+ rel: '0',
+    playsinline: '1',
+    origin: location.origin,
+    enablejsapi: '1'
+  });
 
+  const frame = document.createElement('iframe');
+  frame.title = 'YouTube video player';
+  frame.src =
+    'https://www.youtube-nocookie.com/embed/' +
+    encodeURIComponent(id) + '?' + params.toString();
+
+  frame.allow =
+    'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+
+  frame.referrerPolicy = 'origin';
+  frame.allowFullscreen = true;
+
+  $('youtubeFrameWrap').replaceChildren(frame);
+  $('youtubeStatus').textContent = 'Loading YouTube player...';
+}
 // MINESWEEPER
 let mw=9,mh=9,mineCount=10,mineVals=[],mineOpen=new Set(),mineFlags=new Set(),mineEnded=false,mineFirst=true,flagMode=false;
 function newMines(){[mw,mh,mineCount]=$('mineLevel').value.split(',').map(Number);mineVals=Array(mw*mh).fill(0);mineOpen.clear();mineFlags.clear();mineEnded=false;mineFirst=true;flagMode=false;$('flagMode').textContent='⚑ Flag mode: off';$('mineStatus').textContent='Good luck!';$('mineLeft').textContent=mineCount;placeMines();renderMines()}
